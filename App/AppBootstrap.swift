@@ -11,12 +11,19 @@ public final class AppBootstrap {
         logger.debug("Initialized AppBootstrap")
     }
 
-    public func bootstrap() -> StartupState {
+    public func bootstrap() async throws -> StartupState {
         logger.debug("bootstrap() started")
+
+        // Phase 1: no real startup work yet.
+        // Future: database initialization, migration execution,
+        // connector preparation, and sync checks are added here.
 
         let result: StartupState = .ready
 
-        logger.debug("bootstrap() completed. result=\(String(describing: result), privacy: .public)")
+        logger.debug(
+            "bootstrap() completed. result=\(String(describing: result), privacy: .public)"
+        )
+
         return result
     }
 }

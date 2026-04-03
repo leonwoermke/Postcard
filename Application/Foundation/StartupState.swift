@@ -4,4 +4,5 @@ public enum StartupState: Equatable {
     case idle
     case loading
     case ready
+    case failed(String)
 }

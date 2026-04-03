@@ -1,44 +1,43 @@
 import Foundation
 import OSLog
 
+/// Composition root. Owns system assembly only.
+/// Does not execute startup behavior.
+/// Does not store transient UI state.
+///
+/// Lifetime conventions:
+/// - `appBootstrap`, `startupUseCase` → application-lifetime shared instances
+/// - `make*` methods → create a new instance per call (screen-lifetime or operation-lifetime)
 public final class AppContainer {
     private let logger = Logger(
         subsystem: "com.leonwoermke.postcard",
         category: "Application.AppContainer"
     )
 
-    private let initialStartupState: StartupState
+    // MARK: - Application-lifetime shared dependencies
 
-    private lazy var sharedAppBootstrap: AppBootstrap = {
+    public private(set) lazy var appBootstrap: AppBootstrap = {
         logger.debug("Creating shared AppBootstrap")
         return AppBootstrap()
     }()
 
-    private lazy var sharedRootViewModel: RootViewModel = {
-        logger.debug(
-            "Creating shared RootViewModel. initialStartupState=\(String(describing: self.initialStartupState), privacy: .public)"
-        )
-        return RootViewModel(
-            appBootstrap: sharedAppBootstrap,
-            initialState: initialStartupState
-        )
+    public private(set) lazy var startupUseCase: StartupUseCase = {
+        logger.debug("Creating shared StartupUseCase")
+        return StartupUseCase(appBootstrap: appBootstrap)
     }()
 
-    public init(initialStartupState: StartupState = .idle) {
-        self.initialStartupState = initialStartupState
+    // MARK: - Init
 
-        logger.debug(
-            "Initialized AppContainer. initialStartupState=\(String(describing: initialStartupState), privacy: .public)"
-        )
+    public init() {
+        logger.debug("Initialized AppContainer")
     }
 
-    public func makeAppBootstrap() -> AppBootstrap {
-        logger.debug("Factory call: makeAppBootstrap")
-        return sharedAppBootstrap
-    }
+    // MARK: - Screen-lifetime factories
 
+    /// Creates a new RootViewModel per call.
+    /// Caller is responsible for lifetime management.
     public func makeRootViewModel() -> RootViewModel {
         logger.debug("Factory call: makeRootViewModel")
-        return sharedRootViewModel
+        return RootViewModel(startupUseCase: startupUseCase)
     }
 }
