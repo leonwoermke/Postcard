@@ -14,7 +14,7 @@ public struct Message: Equatable, Hashable, Sendable {
     public let participants: [Participant]
     public let sentAt: Date?
     public let receivedAt: Date?
-    public let attachments: [Attachment]
+    public let attachmentIDs: [AttachmentID]
     public let inReplyToInternetMessageID: String?
     public let referenceInternetMessageIDs: [String]
     public let direction: Direction
@@ -28,7 +28,7 @@ public struct Message: Equatable, Hashable, Sendable {
         participants: [Participant],
         sentAt: Date? = nil,
         receivedAt: Date? = nil,
-        attachments: [Attachment] = [],
+        attachmentIDs: [AttachmentID] = [],
         inReplyToInternetMessageID: String? = nil,
         referenceInternetMessageIDs: [String] = [],
         direction: Direction
@@ -41,7 +41,7 @@ public struct Message: Equatable, Hashable, Sendable {
         self.participants = participants
         self.sentAt = sentAt
         self.receivedAt = receivedAt
-        self.attachments = attachments
+        self.attachmentIDs = attachmentIDs
         self.inReplyToInternetMessageID = inReplyToInternetMessageID
         self.referenceInternetMessageIDs = referenceInternetMessageIDs
         self.direction = direction

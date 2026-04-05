@@ -12,21 +12,9 @@ public struct Override: Equatable, Hashable, Sendable {
         case global
     }
 
-    public enum BlockOverrideKind: Equatable, Hashable, Sendable {
-        case primaryContent
-        case supportingContent
-        case quote
-        case signatureLike
-        case tabular
-        case actionCluster
-        case boilerplate
-        case unknown
-        case other(String)
-    }
-
     public enum Payload: Equatable, Hashable, Sendable {
         case messageKind(InterpretationResolution<MessageKind>)
-        case blockKind(InterpretationResolution<BlockOverrideKind>)
+        case blockKind(InterpretationResolution<BlockInterpretation.Kind>)
         case entityKind(InterpretationResolution<EntityKind>)
         case assignment(roomID: RoomID, clusterID: ClusterID?)
     }

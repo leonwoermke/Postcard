@@ -2,7 +2,7 @@ import SwiftUI
 import OSLog
 
 public struct RootView: View {
-    @StateObject private var viewModel: RootViewModel
+    @ObservedObject private var viewModel: RootViewModel
 
     private let logger = Logger(
         subsystem: "com.leonwoermke.postcard",
@@ -10,8 +10,7 @@ public struct RootView: View {
     )
 
     public init(viewModel: RootViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel)
-
+        self.viewModel = viewModel
         logger.debug("Initialized RootView")
     }
 

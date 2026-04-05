@@ -32,11 +32,6 @@ public final class AppContainer {
         logger.debug("Initialized AppContainer")
     }
 
-    public func makeAppBootstrap() -> any StartupBootstrapping {
-        logger.debug("Factory call: makeAppBootstrap")
-        return startupBootstrapper
-    }
-
     @MainActor
     public func makeRootViewModel() -> RootViewModel {
         logger.debug("Factory call: makeRootViewModel")
