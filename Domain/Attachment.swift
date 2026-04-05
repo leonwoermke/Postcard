@@ -1,10 +1,18 @@
 import Foundation
 
+/// A canonical file artifact associated with a Message.
+///
+/// Attachment records only stable, observable facts about the file:
+/// what kind of file it is (AttachmentKind), its metadata, and its
+/// relationship to the Message.
+///
+/// Safety evaluation is contextual and risk-evaluative — it is not a
+/// canonical fact. It lives in AttachmentInterpretation, which can be
+/// revised independently without touching the canonical record.
 public struct Attachment: Equatable, Hashable, Sendable {
     public let id: AttachmentID
     public let messageID: MessageID
     public let kind: AttachmentKind
-    public let safetyClassification: SafetyClassification
     public let filename: String?
     public let mimeType: String?
     public let byteSize: Int?
@@ -15,7 +23,6 @@ public struct Attachment: Equatable, Hashable, Sendable {
         id: AttachmentID = AttachmentID(),
         messageID: MessageID,
         kind: AttachmentKind = .unknown,
-        safetyClassification: SafetyClassification = .safe,
         filename: String? = nil,
         mimeType: String? = nil,
         byteSize: Int? = nil,
@@ -25,7 +32,6 @@ public struct Attachment: Equatable, Hashable, Sendable {
         self.id = id
         self.messageID = messageID
         self.kind = kind
-        self.safetyClassification = safetyClassification
         self.filename = filename
         self.mimeType = mimeType
         self.byteSize = byteSize
