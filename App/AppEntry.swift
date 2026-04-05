@@ -2,6 +2,7 @@ import SwiftUI
 import OSLog
 
 @main
+@MainActor
 struct AppEntry: App {
 
     private let logger = Logger(

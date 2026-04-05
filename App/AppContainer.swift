@@ -36,6 +36,7 @@ public final class AppContainer {
 
     /// Creates a new RootViewModel per call.
     /// Caller is responsible for lifetime management.
+    @MainActor
     public func makeRootViewModel() -> RootViewModel {
         logger.debug("Factory call: makeRootViewModel")
         return RootViewModel(startupUseCase: startupUseCase)
