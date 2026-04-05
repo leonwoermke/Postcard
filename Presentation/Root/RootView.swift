@@ -11,6 +11,7 @@ public struct RootView: View {
 
     public init(viewModel: RootViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
+
         logger.debug("Initialized RootView")
     }
 
@@ -25,14 +26,11 @@ public struct RootView: View {
 
             case .ready:
                 Text("Postcard")
-
-            case .failed(let reason):
-                Text("Startup failed: \(reason)")
             }
         }
         .task {
             logger.debug(
-                "RootView task entered. state=\(String(describing: viewModel.startupState), privacy: .public)"
+                "RootView task entered. currentState=\(String(describing: viewModel.startupState), privacy: .public)"
             )
             await viewModel.start()
         }

@@ -1,6 +1,8 @@
 import Foundation
 
-public struct RenderableMessage: Equatable, Hashable, Sendable {
+public protocol DerivedProjectionInput: Equatable, Hashable, Sendable {}
+
+public struct RenderableMessage: DerivedProjectionInput {
     public struct BlockEntry: Equatable, Hashable, Sendable {
         public let block: Block
         public let interpretation: BlockInterpretation?

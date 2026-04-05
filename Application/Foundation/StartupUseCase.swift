@@ -1,32 +1,40 @@
 import Foundation
 import OSLog
 
-public final class StartupUseCase {
-    private let appBootstrap: AppBootstrap
+public actor StartupUseCase {
+    private let bootstrapper: any StartupBootstrapping
     private let logger = Logger(
         subsystem: "com.leonwoermke.postcard",
         category: "Application.StartupUseCase"
     )
 
-    public init(appBootstrap: AppBootstrap) {
-        self.appBootstrap = appBootstrap
+    private var cachedResult: StartupState?
+
+    public init(bootstrapper: any StartupBootstrapping) {
+        self.bootstrapper = bootstrapper
+
         logger.debug("Initialized StartupUseCase")
     }
 
-    public func execute() async -> StartupState {
-        logger.debug("execute() started")
+    public func start() async throws -> StartupState {
+        logger.debug("start() entered")
 
-        do {
-            let result = try await appBootstrap.bootstrap()
+        if let cachedResult {
             logger.debug(
-                "execute() completed. result=\(String(describing: result), privacy: .public)"
+                "start() returning cached result. result=\(String(describing: cachedResult), privacy: .public)"
             )
-            return result
-        } catch {
-            logger.error(
-                "execute() failed. error=\(error.localizedDescription, privacy: .public)"
-            )
-            return .failed(error.localizedDescription)
+            return cachedResult
         }
+
+        logger.debug("start() executing bootstrap. reason=no_cached_result")
+
+        let result = try await bootstrapper.bootstrap()
+        cachedResult = result
+
+        logger.debug(
+            "start() completed. cachedResult=\(String(describing: result), privacy: .public)"
+        )
+
+        return result
     }
 }

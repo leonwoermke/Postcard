@@ -1,23 +1,12 @@
 import Foundation
 
 public struct Entity: Equatable, Hashable, Sendable {
-    public struct SourceRegion: Equatable, Hashable, Sendable {
-        public let contentForm: ContentForm
-        public let range: Range<Int>
+    public struct SourceRegion: Equatable, Hashable, Sendable, Codable {
+        public let sourceRegion: EntityID.SourceRegion
 
-        public init(
-            contentForm: ContentForm,
-            range: Range<Int>
-        ) {
-            self.contentForm = contentForm
-            self.range = range
+        public init(sourceRegion: EntityID.SourceRegion) {
+            self.sourceRegion = sourceRegion
         }
-    }
-
-    public enum ContentForm: Equatable, Hashable, Sendable {
-        case plainText
-        case html
-        case normalizedText
     }
 
     public let id: EntityID

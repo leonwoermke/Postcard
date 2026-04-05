@@ -1,23 +1,12 @@
 import Foundation
 
 public struct Block: Equatable, Hashable, Sendable {
-    public struct Boundary: Equatable, Hashable, Sendable {
-        public let contentForm: ContentForm
-        public let range: Range<Int>
+    public struct Boundary: Equatable, Hashable, Sendable, Codable {
+        public let sourceBoundary: BlockID.SourceBoundary
 
-        public init(
-            contentForm: ContentForm,
-            range: Range<Int>
-        ) {
-            self.contentForm = contentForm
-            self.range = range
+        public init(sourceBoundary: BlockID.SourceBoundary) {
+            self.sourceBoundary = sourceBoundary
         }
-    }
-
-    public enum ContentForm: Equatable, Hashable, Sendable {
-        case plainText
-        case html
-        case normalizedText
     }
 
     public let id: BlockID

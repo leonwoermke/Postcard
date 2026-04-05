@@ -145,17 +145,90 @@ public struct PreferenceID: Equatable, Hashable, Sendable, Codable {
 }
 
 public struct BlockID: Equatable, Hashable, Sendable, Codable {
-    public let rawValue: String
+    public enum ContentForm: String, Equatable, Hashable, Sendable, Codable {
+        case plainText
+        case html
+        case normalizedText
+    }
 
-    public init(rawValue: String) {
+    public struct SourceBoundary: Equatable, Hashable, Sendable, Codable {
+        public let contentForm: ContentForm
+        public let lowerBound: Int
+        public let upperBound: Int
+
+        public init(
+            contentForm: ContentForm,
+            lowerBound: Int,
+            upperBound: Int
+        ) {
+            self.contentForm = contentForm
+            self.lowerBound = lowerBound
+            self.upperBound = upperBound
+        }
+    }
+
+    public let rawValue: String
+    public let messageID: MessageID
+    public let sourceBoundary: SourceBoundary
+
+    public init(
+        rawValue: String,
+        messageID: MessageID,
+        sourceBoundary: SourceBoundary
+    ) {
         self.rawValue = rawValue
+        self.messageID = messageID
+        self.sourceBoundary = sourceBoundary
     }
 }
 
 public struct EntityID: Equatable, Hashable, Sendable, Codable {
-    public let rawValue: String
+    public struct SourceRegion: Equatable, Hashable, Sendable, Codable {
+        public let contentForm: BlockID.ContentForm
+        public let lowerBound: Int
+        public let upperBound: Int
 
-    public init(rawValue: String) {
+        public init(
+            contentForm: BlockID.ContentForm,
+            lowerBound: Int,
+            upperBound: Int
+        ) {
+            self.contentForm = contentForm
+            self.lowerBound = lowerBound
+            self.upperBound = upperBound
+        }
+    }
+
+    public struct SourceDescriptor: Equatable, Hashable, Sendable, Codable {
+        public let messageID: MessageID
+        public let blockID: BlockID?
+        public let kind: EntityKind
+        public let rawValue: String
+        public let sourceRegion: SourceRegion?
+
+        public init(
+            messageID: MessageID,
+            blockID: BlockID? = nil,
+            kind: EntityKind,
+            rawValue: String,
+            sourceRegion: SourceRegion? = nil
+        ) {
+            self.messageID = messageID
+            self.blockID = blockID
+            self.kind = kind
+            self.rawValue = rawValue
+            self.sourceRegion = sourceRegion
+        }
+    }
+
+    public let rawValue: String
+    public let sourceDescriptor: SourceDescriptor
+
+    public init(
+        rawValue: String,
+        sourceDescriptor: SourceDescriptor
+    ) {
         self.rawValue = rawValue
+        self.sourceDescriptor = sourceDescriptor
     }
 }

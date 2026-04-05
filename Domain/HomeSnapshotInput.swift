@@ -1,6 +1,6 @@
 import Foundation
 
-public struct HomeSnapshotInput: Equatable, Hashable, Sendable {
+public struct HomeSnapshotInput: DerivedProjectionInput {
     public struct RoomEntry: Equatable, Hashable, Sendable {
         public let room: Room
         public let latestMessage: RenderableMessage?
