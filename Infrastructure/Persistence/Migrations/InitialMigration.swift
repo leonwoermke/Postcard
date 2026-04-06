@@ -210,6 +210,10 @@ public enum InitialMigration {
     private static func createEntityInterpretationsTable(in database: Database) throws {
         try database.create(table: "entity_interpretations") { table in
             table.column("entity_id", .text).primaryKey()
+            table.column("message_id", .text)
+                .notNull()
+                .indexed()
+                .references("messages", column: "id", onDelete: .cascade)
             table.column("source_descriptor", .blob).notNull()
             table.column("payload", .blob).notNull()
         }
@@ -244,6 +248,7 @@ public enum InitialMigration {
             table.column("room_id", .text).indexed()
             table.column("block_id", .text).indexed()
             table.column("entity_id", .text).indexed()
+            table.column("sender_address", .text).indexed()
             table.column("payload", .blob).notNull()
         }
     }
@@ -252,6 +257,10 @@ public enum InitialMigration {
         try database.create(table: "adaptive_profiles") { table in
             table.column("id", .text).primaryKey()
             table.column("account_id", .text).indexed()
+                .references("accounts", column: "id", onDelete: .cascade)
+            table.column("room_id", .text)
+                .references("rooms", column: "id", onDelete: .cascade)
+            table.column("sender_address", .text)
             table.column("payload", .blob).notNull()
         }
     }

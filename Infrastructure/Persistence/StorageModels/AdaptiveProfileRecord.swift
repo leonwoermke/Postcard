@@ -11,7 +11,15 @@ public struct AdaptiveProfileRecord: Codable, FetchableRecord, PersistableRecord
         public static let senderAddress = Column("sender_address")
         public static let payload = Column("payload")
     }
-
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case accountID = "account_id"
+        case roomID = "room_id"
+        case senderAddress = "sender_address"
+        case payload
+    }
+    
     public let id: String
     public let accountID: String?
     public let roomID: String?
@@ -20,7 +28,7 @@ public struct AdaptiveProfileRecord: Codable, FetchableRecord, PersistableRecord
 
     public init(id: AdaptiveProfileID, adaptiveProfile: AdaptiveProfile) throws {
         self.id = id.rawValue.uuidString
-        self.accountID = nil
+        self.accountID = adaptiveProfile.accountID.rawValue.uuidString
 
         switch adaptiveProfile.scope {
         case .room(let roomID):
@@ -61,12 +69,14 @@ public struct AdaptiveProfileRecord: Codable, FetchableRecord, PersistableRecord
 }
 
 private struct AdaptiveProfilePayload: Codable, Sendable {
+    let accountID: String
     let scope: AdaptiveProfileScopePayload
     let tendencies: [AdaptiveProfileTendencyPayload]
     let evidenceCount: Int
     let decayMetadata: AdaptiveProfileDecayMetadataPayload
 
     init(_ profile: AdaptiveProfile) {
+        self.accountID = profile.accountID.rawValue.uuidString
         self.scope = AdaptiveProfileScopePayload(profile.scope)
         self.tendencies = profile.tendencies.map(AdaptiveProfileTendencyPayload.init)
         self.evidenceCount = profile.evidenceCount
@@ -74,8 +84,15 @@ private struct AdaptiveProfilePayload: Codable, Sendable {
     }
 
     func toDomain(id: AdaptiveProfileID) throws -> AdaptiveProfile {
-        AdaptiveProfile(
+        guard let accountUUID = UUID(uuidString: accountID) else {
+            throw DecodingError.dataCorrupted(
+                .init(codingPath: [], debugDescription: "Invalid accountID: \(accountID)")
+            )
+        }
+
+        return AdaptiveProfile(
             id: id,
+            accountID: AccountID(rawValue: accountUUID),
             scope: try scope.toDomain(),
             tendencies: try tendencies.map { try $0.toDomain() },
             evidenceCount: evidenceCount,

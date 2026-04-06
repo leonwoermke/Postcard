@@ -9,6 +9,12 @@ public struct PreferenceRecord: Codable, FetchableRecord, PersistableRecord, Sen
         public static let accountID = Column("account_id")
         public static let payload = Column("payload")
     }
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case accountID = "account_id"
+        case payload
+    }
 
     public let id: String
     public let accountID: String?

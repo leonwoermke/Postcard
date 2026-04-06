@@ -93,17 +93,32 @@ public final class SearchRepositoryGRDB: SearchRepository, @unchecked Sendable {
     private func candidateMessageIDs(scope: SearchScope, db: Database) throws -> [String] {
         switch scope {
         case .global:
-            return try MessageRecord
-                .select(MessageRecord.Columns.id)
-                .fetchAll(db)
-                .map(\.id)
+            let rows = try Row.fetchAll(
+                db,
+                sql: """
+                SELECT id
+                FROM messages
+                """
+            )
+
+            return rows.map { row in
+                row["id"]
+            }
 
         case .room(let roomID):
-            return try AssignmentRecord
-                .select(AssignmentRecord.Columns.messageID)
-                .filter(AssignmentRecord.Columns.roomID == roomID.rawValue.uuidString)
-                .fetchAll(db)
-                .map(\.messageID)
+            let rows = try Row.fetchAll(
+                db,
+                sql: """
+                SELECT message_id
+                FROM assignments
+                WHERE room_id = ?
+                """,
+                arguments: [roomID.rawValue.uuidString]
+            )
+
+            return rows.map { row in
+                row["message_id"]
+            }
 
         case .contact(let contactID):
             guard let contactRecord = try ContactRecord
@@ -117,12 +132,24 @@ public final class SearchRepositoryGRDB: SearchRepository, @unchecked Sendable {
             let emails = contact.emailAddresses
             guard !emails.isEmpty else { return [] }
 
-            return try ParticipantRecord
-                .select(ParticipantRecord.Columns.messageID)
-                .filter(emails.contains(ParticipantRecord.Columns.address))
-                .fetchAll(db)
-                .map(\.messageID)
+            let rows = try Row.fetchAll(
+                db,
+                sql: """
+                SELECT message_id
+                FROM participants
+                WHERE address IN (\(databaseQuestionMarks(count: emails.count)))
+                """,
+                arguments: StatementArguments(emails)
+            )
+
+            return rows.map { row in
+                row["message_id"]
+            }
         }
+    }
+
+    private func databaseQuestionMarks(count: Int) -> String {
+        Array(repeating: "?", count: count).joined(separator: ", ")
     }
 }
 

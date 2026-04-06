@@ -77,10 +77,6 @@ public final class DatabaseContainer: Sendable {
         var migrator = DatabaseMigrator()
         InitialMigration.register(on: &migrator)
         BlockInterpretationMessageIDMigration.register(on: &migrator)
-        PreferencesAccountIDMigration.register(on: &migrator)
-        AdaptiveProfilesAccountIDMigration.register(on: &migrator)
-        AdaptiveProfilesScopeColumnsMigration.register(on: &migrator)
-        AdaptiveAndInterpretationIndexMigration.register(on: &migrator)
         logger.debug("DatabaseContainer.setUp — migrations registered")
 
         try await migrator.migrate(queue)
@@ -166,7 +162,7 @@ private struct PreferencesAccountIDMigration {
     static func register(on migrator: inout DatabaseMigrator) {
         migrator.registerMigration("003_add_accountID_to_preferences") { db in
             try db.alter(table: "preferences") { t in
-                t.add(column: "accountID", .text).notNull()
+                t.add(column: "account_id", .text).notNull()
                     .references("accounts", onDelete: .cascade)
             }
             try db.create(index: "preferences_on_accountID", on: "preferences", columns: ["accountID"]) 
@@ -178,24 +174,10 @@ private struct AdaptiveProfilesAccountIDMigration {
     static func register(on migrator: inout DatabaseMigrator) {
         migrator.registerMigration("004_add_accountID_to_adaptive_profiles") { db in
             try db.alter(table: "adaptive_profiles") { t in
-                t.add(column: "accountID", .text).notNull()
+                t.add(column: "account_id", .text).notNull()
                     .references("accounts", onDelete: .cascade)
             }
             try db.create(index: "adaptive_profiles_on_accountID", on: "adaptive_profiles", columns: ["accountID"]) 
-        }
-    }
-}
-
-private struct AdaptiveProfilesScopeColumnsMigration {
-    static func register(on migrator: inout DatabaseMigrator) {
-        migrator.registerMigration("005_add_scope_columns_to_adaptive_profiles") { db in
-            try db.alter(table: "adaptive_profiles") { t in
-                t.add(column: "roomID", .text)
-                    .references("rooms", onDelete: .cascade)
-                t.add(column: "senderAddress", .text)
-            }
-            try db.create(index: "adaptive_profiles_on_roomID", on: "adaptive_profiles", columns: ["roomID"]) 
-            try db.create(index: "adaptive_profiles_on_senderAddress", on: "adaptive_profiles", columns: ["senderAddress"]) 
         }
     }
 }
