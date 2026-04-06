@@ -88,6 +88,7 @@ public struct AdaptiveProfile: Equatable, Hashable, Sendable {
     }
 
     public let id: AdaptiveProfileID
+    public let accountID: AccountID
     public let scope: Scope
     public let tendencies: [Tendency]
     public let evidenceCount: Int
@@ -95,15 +96,18 @@ public struct AdaptiveProfile: Equatable, Hashable, Sendable {
 
     public init(
         id: AdaptiveProfileID = AdaptiveProfileID(),
+        accountID: AccountID,
         scope: Scope,
         tendencies: [Tendency],
         evidenceCount: Int,
         decayMetadata: DecayMetadata
     ) {
         self.id = id
+        self.accountID = accountID
         self.scope = scope
         self.tendencies = tendencies
         self.evidenceCount = evidenceCount
         self.decayMetadata = decayMetadata
     }
 }
+
