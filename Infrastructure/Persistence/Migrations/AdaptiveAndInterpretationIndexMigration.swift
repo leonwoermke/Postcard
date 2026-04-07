@@ -4,19 +4,6 @@ import GRDB
 enum AdaptiveAndInterpretationIndexMigration {
     static func register(on migrator: inout DatabaseMigrator) {
         migrator.registerMigration("phase3_adaptive_and_interpretation_indexes") { db in
-            try db.alter(table: AdaptiveProfileRecord.databaseTableName) { table in
-                table.add(column: "room_id", .text)
-                table.add(column: "sender_address", .text)
-            }
-
-            try db.alter(table: LearningEventRecord.databaseTableName) { table in
-                table.add(column: "sender_address", .text)
-            }
-
-            try db.alter(table: EntityInterpretationRecord.databaseTableName) { table in
-                table.add(column: "message_id", .text)
-            }
-
             try db.create(index: "idx_adaptive_profiles_room_id", on: AdaptiveProfileRecord.databaseTableName, columns: ["room_id"], ifNotExists: true)
             try db.create(index: "idx_adaptive_profiles_sender_address", on: AdaptiveProfileRecord.databaseTableName, columns: ["sender_address"], ifNotExists: true)
             try db.create(index: "idx_learning_events_sender_address", on: LearningEventRecord.databaseTableName, columns: ["sender_address"], ifNotExists: true)

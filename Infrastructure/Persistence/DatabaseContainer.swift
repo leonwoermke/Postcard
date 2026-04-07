@@ -77,6 +77,7 @@ public final class DatabaseContainer: Sendable {
         var migrator = DatabaseMigrator()
         InitialMigration.register(on: &migrator)
         BlockInterpretationMessageIDMigration.register(on: &migrator)
+        AdaptiveAndInterpretationIndexMigration.register(on: &migrator)
         logger.debug("DatabaseContainer.setUp — migrations registered")
 
         try await migrator.migrate(queue)
@@ -151,33 +152,10 @@ private struct BlockInterpretationMessageIDMigration {
             try db.alter(table: "block_interpretations") { t in
                 t.add(column: "message_id", .text).notNull()
                     .references("messages", onDelete: .cascade)
-                t.add(column: "source_boundary", .text).notNull()
+                // Store boundary as a blob to match StorageCoding.encodePayload(Data)
+                t.add(column: "source_boundary", .blob).notNull()
             }
-            try db.create(index: "block_interpretations_on_message_id", on: "block_interpretations", columns: ["message_id"]) 
-        }
-    }
-}
-
-private struct PreferencesAccountIDMigration {
-    static func register(on migrator: inout DatabaseMigrator) {
-        migrator.registerMigration("003_add_accountID_to_preferences") { db in
-            try db.alter(table: "preferences") { t in
-                t.add(column: "account_id", .text).notNull()
-                    .references("accounts", onDelete: .cascade)
-            }
-            try db.create(index: "preferences_on_accountID", on: "preferences", columns: ["accountID"]) 
-        }
-    }
-}
-
-private struct AdaptiveProfilesAccountIDMigration {
-    static func register(on migrator: inout DatabaseMigrator) {
-        migrator.registerMigration("004_add_accountID_to_adaptive_profiles") { db in
-            try db.alter(table: "adaptive_profiles") { t in
-                t.add(column: "account_id", .text).notNull()
-                    .references("accounts", onDelete: .cascade)
-            }
-            try db.create(index: "adaptive_profiles_on_accountID", on: "adaptive_profiles", columns: ["accountID"]) 
+            try db.create(index: "block_interpretations_on_message_id", on: "block_interpretations", columns: ["message_id"])
         }
     }
 }
